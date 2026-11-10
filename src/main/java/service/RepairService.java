@@ -43,6 +43,14 @@ public class RepairService {
         System.out.println("[Service] Ремонт по заказу №" + orderId + " выполнен");
     }
 
+    public void cancelOrder(int orderId) {
+        RepairOrder order = getRequiredOrder(orderId);
+        if (order.getStatus() == RepairOrder.Status.COMPLETED) {
+            throw new IllegalStateException("Нельзя отменить завершённый заказ");
+        }
+        changeStatus(orderId, RepairOrder.Status.CANCELLED);
+    }
+
     public RepairOrder findById(int orderId) {
         System.out.println("[Service] Получение заказа №" + orderId);
         return getRequiredOrder(orderId);

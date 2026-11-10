@@ -4,7 +4,8 @@ public class RepairOrder {
     public enum Status {
         CREATED,
         IN_PROGRESS,
-        COMPLETED
+        COMPLETED,
+        CANCELLED
     }
 
     private final int id;

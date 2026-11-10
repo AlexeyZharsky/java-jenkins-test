@@ -54,6 +54,32 @@ class RepairServiceTest {
         assertEquals(RepairOrder.Status.IN_PROGRESS, order.getStatus());
     }
 
+    @Test
+    @DisplayName("Отмена незавершённого заказа")
+    void shouldCancelUncompletedOrder() {
+        RepairOrder order = service.createOrder(customer(), car(), "Диагностика");
+
+        service.cancelOrder(order.getId());
+
+        assertEquals(RepairOrder.Status.CANCELLED, order.getStatus());
+    }
+
+    @Test
+    @DisplayName("Запрет отмены завершённого заказа")
+    void shouldRejectCancellationOfCompletedOrder() {
+        RepairOrder order = service.createOrder(customer(), car(), "Диагностика");
+        service.markRepairPerformed(order.getId());
+        service.changeStatus(order.getId(), RepairOrder.Status.COMPLETED);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> service.cancelOrder(order.getId())
+        );
+
+        assertEquals("Нельзя отменить завершённый заказ", exception.getMessage());
+        assertEquals(RepairOrder.Status.COMPLETED, order.getStatus());
+    }
+
     private Customer customer() {
         return new Customer(1, "Тестовый клиент");
     }
